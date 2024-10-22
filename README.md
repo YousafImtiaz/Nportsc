@@ -12,7 +12,7 @@ Nportsc is an Nmap port scanning script written in Python using ChatGPT that aut
 ## Requirements
 - Python 3.x
 - Nmap
-- Mousepad (can be changed on line 108 if you wish to use a different text editor)
+- Mousepad
 - Sudo privileges: The script requires `sudo` to run because it allows Nmap to perform scans faster and more efficiently
 
 ## Usage
