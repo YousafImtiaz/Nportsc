@@ -1,9 +1,3 @@
-# Tool: Nportsc (Nmap Port Scan)
-# Script made using the help of ChatGPT. Author: Yousaf Imtiaz (www.linkedin.com/in/yousaf-imtiaz)
-# Usage: sudo python3 nportsc.py <target-ip> --tcp or --udp
-# Scan speed can be adjusted on line 26 and 31 (Default: -T3 for TCP, -T4 for UDP)
-# Version 1.0
-
 #!/usr/bin/python3
 
 import subprocess
@@ -41,14 +35,14 @@ def format_output_for_readability(scan_output):
 
     return "\n".join(formatted_output)
 
-def run_nmap_quick_scan(target_ip, scan_type):
+def run_nmap_quick_scan(target_ip, scan_type, timing_template):
     """Run the quick Nmap scan on the target IP for either TCP or UDP."""
     if scan_type == 'tcp':
-        print(f"Running quick TCP scan on {target_ip}...")
-        command = ["sudo", "nmap", "-p-", "-T3", target_ip]
+        print(f"Running quick TCP scan on {target_ip} with timing template {timing_template}...")
+        command = ["sudo", "nmap", "-p-", f"-{timing_template}", target_ip]
     elif scan_type == 'udp':
-        print(f"Running quick UDP scan on {target_ip}...")
-        command = ["sudo", "nmap", "-sU", "--top-ports=100", "-T4", target_ip]  # -sU flag for UDP scanning
+        print(f"Running quick UDP scan on {target_ip} with timing template {timing_template}...")
+        command = ["sudo", "nmap", "-sU", "--top-ports=100", f"-{timing_template}", target_ip]  # -sU flag for UDP scanning
 
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -124,6 +118,7 @@ def main():
     parser.add_argument('target_ip', help='Target IP address to scan')
     parser.add_argument('--tcp', action='store_true', help='Run TCP scan')
     parser.add_argument('--udp', action='store_true', help='Run UDP scan')
+    parser.add_argument('timing_template', choices=['T1', 'T2', 'T3', 'T4', 'T5'], help='Specify Nmap timing template (T1 to T5)')
 
     args = parser.parse_args()
 
@@ -133,9 +128,10 @@ def main():
 
     scan_type = 'tcp' if args.tcp else 'udp'
     target_ip = args.target_ip
+    timing_template = args.timing_template
 
     try:
-        scan_output = run_nmap_quick_scan(target_ip, scan_type)
+        scan_output = run_nmap_quick_scan(target_ip, scan_type, timing_template)
         open_ports = extract_open_ports(scan_output)
         run_nmap_detail_scan(target_ip, open_ports, scan_type)
     except KeyboardInterrupt:
