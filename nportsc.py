@@ -123,7 +123,7 @@ def main():
     args = parser.parse_args()
 
     if not args.tcp and not args.udp:
-        print("Please specify either --tcp or --udp to select the scan type.")
+        print("Please specify --tcp or --udp to select the scan type.")
         sys.exit(1)
 
     scan_type = 'tcp' if args.tcp else 'udp'
