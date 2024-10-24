@@ -42,7 +42,7 @@ def run_nmap_quick_scan(target_ip, scan_type, timing_template):
         command = ["sudo", "nmap", "-p-", f"-{timing_template}", target_ip]
     elif scan_type == 'udp':
         print(f"Running quick UDP scan on {target_ip} with timing template {timing_template}...")
-        command = ["sudo", "nmap", "-sU", "--top-ports=100", f"-{timing_template}", target_ip]  # -sU flag for UDP scanning
+        command = ["sudo", "nmap", "-sU", "--top-ports=100", "--open", f"-{timing_template}", target_ip]  # -sU flag for UDP scanning
 
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
