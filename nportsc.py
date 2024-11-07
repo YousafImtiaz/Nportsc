@@ -6,9 +6,10 @@ import re
 import argparse
 import os
 
-# ANSI escape code for orange
+# ANSI escape codes for colors
 ORANGE = "\033[38;5;214m"  # Using a specific 256-color orange
 RESET = "\033[0m"  # Reset to default color
+RED = "\033[31m"  # Red color for highlighting
 
 def check_sudo():
     """Check if the script is running with sudo (root privileges)."""
@@ -59,6 +60,7 @@ def run_nmap_quick_scan(target_ip, scan_type, timing_template):
 def extract_open_ports(scan_output):
     """Extract open ports from the scan output."""
     open_ports = []
+    http_ports = []
     for line in scan_output.splitlines():
         match = re.match(r'^\s*(\d+)/tcp\s+open', line)  # Extract TCP ports
         if match:
@@ -67,10 +69,15 @@ def extract_open_ports(scan_output):
         match_udp = re.match(r'^\s*(\d+)/udp\s+open', line)  # Extract UDP ports
         if match_udp:
             open_ports.append(match_udp.group(1))
-            
-    return open_ports
 
-def run_nmap_detail_scan(target_ip, open_ports, scan_type):
+        # Detect HTTP-related services (default or non-standard ports)
+        match_http = re.match(r'^\s*(\d+)/tcp\s+open\s+(http|http-alt|http-proxy|https?)', line)
+        if match_http:
+            http_ports.append(match_http.group(1))
+
+    return open_ports, http_ports
+
+def run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type):
     """Run a detailed Nmap scan on the open ports for either TCP or UDP."""
     if not open_ports:
         print("No open ports found. Exiting.")
@@ -100,9 +107,17 @@ def run_nmap_detail_scan(target_ip, open_ports, scan_type):
 
         print(f"Detailed scan results saved to {output_file}.")
         
-        # Open the output file automatically as a normal user and exit the script
-        print(f"Opening {output_file}...")
-        subprocess.Popen(["sudo", "-u", os.getlogin(), "mousepad", output_file])
+        # Display open ports with "open" highlighted in red
+        print("\nOpen ports from scan:")
+        with open(output_file, "r") as file:
+            for line in file:
+                if "open" in line:
+                    print(line.replace("open", f"{RED}open{RESET}"), end="")
+
+        # Open the output file automatically with mousepad
+        print(f"\nOpening {output_file} with mousepad...")
+        subprocess.Popen(["sudo", "-u", os.getlogin(), "env", "DISPLAY=:0", "mousepad", output_file])
+
     except Exception as e:
         print("An error occurred:", str(e))
         sys.exit(1)
@@ -132,8 +147,8 @@ def main():
 
     try:
         scan_output = run_nmap_quick_scan(target_ip, scan_type, timing_template)
-        open_ports = extract_open_ports(scan_output)
-        run_nmap_detail_scan(target_ip, open_ports, scan_type)
+        open_ports, http_ports = extract_open_ports(scan_output)
+        run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type)
     except KeyboardInterrupt:
         print("\nScan cancelled by the user.")
         sys.exit(0)  # Exit gracefully
