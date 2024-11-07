@@ -22,8 +22,8 @@ def print_banner():
   banner_text = "N-port-sc"
   print(f"{ORANGE}{banner_text}{RESET}")  # Print in orange
 
-def format_output_for_readability(scan_output):
-  """Format the Nmap output by adding a blank line between each port entry."""
+def format_output_for_file(scan_output):
+  """Format the Nmap output by adding a blank line between each port entry for file output."""
   formatted_output = []
   lines = scan_output.splitlines()
   
@@ -99,12 +99,12 @@ def run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type):
           print("Error running nmap:", result.stderr)
           sys.exit(1)
 
-      # Format the output for readability
-      formatted_output = format_output_for_readability(result.stdout)
-
-      # Display the formatted output in the terminal
+      # Display the raw output in the terminal
       print("\nDetailed scan results:\n")
-      print(formatted_output)
+      print(result.stdout)
+
+      # Format the output for file readability
+      formatted_output = format_output_for_file(result.stdout)
 
       with open(output_file, "w") as outfile:
           outfile.write(formatted_output)
