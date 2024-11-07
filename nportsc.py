@@ -77,14 +77,14 @@ def run_nmap_detail_scan(target_ip, open_ports, scan_type):
         return
     
     ports = ','.join(open_ports)
+    output_file = f"{target_ip}_{scan_type}_nmap.txt"  # Output file named by IP and scan type
+    
     if scan_type == 'tcp':
         print(f"Running detailed TCP scan on open ports: {ports}...")
-        command = ["sudo", "nmap", "-p", ports, target_ip, "-A"]
-        output_file = "nmaptcp.txt"  # Save TCP scan to nmaptcp.txt
+        command = ["sudo", "nmap", "-p", ports, target_ip, "-sC", "-sV", "-O"]
     elif scan_type == 'udp':
         print(f"Running detailed UDP scan on open ports: {ports}...")
         command = ["sudo", "nmap", "-sU", "-p", ports, "-sV", target_ip]
-        output_file = "nmapudp.txt"  # Save UDP scan to nmapudp.txt
 
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
