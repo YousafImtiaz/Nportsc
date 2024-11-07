@@ -25,4 +25,4 @@ sudo python3 nportsc.py $target-ip --udp (T1,T2,T3,T4,T5)  # For UDP scan
 
 ## Output
 
-The results of the detailed scan will be saved to a text file (nmaptcp<target_ip>.txt for TCP scans and nmapudp<target_ip>.txt for UDP scans) and automatically opened in a text editor. Each port that is scanned will also be seperated, making it easier to read.
+The results of the detailed scan will be saved to a text file (target_ip)_(scan type)_nmap.txt for TCP scans and nmapudp<target_ip>.txt for UDP scans) and automatically opened in a text editor. Each port that is scanned will also be seperated, making it easier to read.
