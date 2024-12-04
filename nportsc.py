@@ -3,8 +3,8 @@
 import subprocess
 import sys
 import re
-import argparse
 import os
+import argparse  # Added import for argparse
 
 # ANSI escape codes for colors
 ORANGE = "\033[38;5;214m"  # Using a specific 256-color orange
@@ -36,14 +36,14 @@ def format_output_for_file(scan_output):
 
     return "\n".join(formatted_output)
 
-def run_nmap_quick_scan(target_ip, scan_type, timing_template, extra_args):
+def run_nmap_quick_scan(target_ip, scan_type, timing_template):
     """Run the quick Nmap scan on the target IP for either TCP or UDP."""
     if scan_type == 'tcp':
         print(f"Running quick TCP scan on {target_ip} with timing {timing_template}...")
-        command = ["sudo", "nmap", "-p-", f"-{timing_template}", target_ip] + extra_args
+        command = ["sudo", "nmap", "-p-", f"-{timing_template}", target_ip]
     elif scan_type == 'udp':
         print(f"Running quick UDP scan on {target_ip} with timing {timing_template}...")
-        command = ["sudo", "nmap", "-sU", "--top-ports=100", "--open", f"-{timing_template}", target_ip] + extra_args  # -sU flag for UDP scanning
+        command = ["sudo", "nmap", "-sU", "--top-ports=100", "--open", f"-{timing_template}", target_ip]  # -sU flag for UDP scanning
 
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -77,7 +77,7 @@ def extract_open_ports(scan_output):
 
     return open_ports, http_ports
 
-def run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type, extra_args):
+def run_nmap_detail_scan(target_ip, open_ports, scan_type):
     """Run a detailed Nmap scan on the open ports for either TCP or UDP."""
     if not open_ports:
         print("No open ports found. Exiting.")
@@ -88,10 +88,10 @@ def run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type, extra_arg
     
     if scan_type == 'tcp':
         print(f"Running detailed TCP scan on open ports: {ports}...")
-        command = ["sudo", "nmap", "-p", ports, target_ip, "-sC", "-sV", "-O"] + extra_args
+        command = ["sudo", "nmap", "-p", ports, target_ip, "-sC", "-sV", "-O"]
     elif scan_type == 'udp':
         print(f"Running detailed UDP scan on open ports: {ports}...")
-        command = ["sudo", "nmap", "-sU", "-p", ports, "-sV", target_ip] + extra_args
+        command = ["sudo", "nmap", "-sU", "-p", ports, "-sV", target_ip]
 
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -118,10 +118,6 @@ def run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type, extra_arg
                 if "open" in line:
                     print(line.replace("open", f"{RED}open{RESET}"), end="")
 
-        # Open the output file automatically with mousepad
-        print(f"\nOpening {output_file} with mousepad...")
-        subprocess.Popen(["sudo", "-u", os.getlogin(), "env", "DISPLAY=:0", "mousepad", output_file])
-
     except Exception as e:
         print("An error occurred:", str(e))
         sys.exit(1)
@@ -138,7 +134,6 @@ def main():
     parser.add_argument('--tcp', action='store_true', help='Run TCP scan')
     parser.add_argument('--udp', action='store_true', help='Run UDP scan')
     parser.add_argument('timing_template', choices=['T1', 'T2', 'T3', 'T4', 'T5'], help='Specify Nmap timing template (T1 to T5)')
-    parser.add_argument('extra_args', nargs=argparse.REMAINDER, help='Additional Nmap arguments')
 
     args = parser.parse_args()
 
@@ -149,12 +144,11 @@ def main():
     scan_type = 'tcp' if args.tcp else 'udp'
     target_ip = args.target_ip
     timing_template = args.timing_template
-    extra_args = args.extra_args
 
     try:
-        scan_output = run_nmap_quick_scan(target_ip, scan_type, timing_template, extra_args)
+        scan_output = run_nmap_quick_scan(target_ip, scan_type, timing_template)
         open_ports, http_ports = extract_open_ports(scan_output)
-        run_nmap_detail_scan(target_ip, open_ports, http_ports, scan_type, extra_args)
+        run_nmap_detail_scan(target_ip, open_ports, scan_type)
     except KeyboardInterrupt:
         print("\nScan cancelled by the user.")
         sys.exit(0)  # Exit gracefully
