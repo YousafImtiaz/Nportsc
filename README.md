@@ -1,15 +1,14 @@
 # Nportsc N-port-sc (Nmap Port Scan)
 
 ## Overview
-Nportsc is an Nmap port scanning script written in Python using ChatGPT that automates the process of running quick and detailed Nmap scans for TCP and UDP ports. The quick scan is displayed in the terminal so you can start enumerating ports such as port 80, while the detailed scan runs and outputs to a file, allowing for efficient multitasking when doing CTF machines or exams such as the OSCP.
+Nportsc is an Nmap port scanning script written in Python with ChatGPT that automates the process of running quick and detailed Nmap scans for TCP and UDP ports. The quick scan is displayed in the terminal so you can start enumerating while the detailed scan runs, outputs to a file while displaying the result in the terminal, and also greps out the open ports in a nice list.
 
 ## Features
-- Quick scanning of TCP and UDP ports using Nmap.
-- Detailed scanning of open ports to retrieve service and version information.
-- Output formatting for better readability.
-- Automatically opens scan results in a text editor.
+- Scanning of both TCP and UDP ports using Nmap.
+- Can add extra flags as the terminal as needed
 - Scan speed can be adjusted based on your environment
 - After scan is complete, will grep out open ports automatically with services
+- Detailed scan outputs to a txt file 
 
 ## Requirements
 - Python 3.x
@@ -20,12 +19,12 @@ Nportsc is an Nmap port scanning script written in Python using ChatGPT that aut
 ## Usage
 To use the script, run the following command in your terminal:
 
-sudo python3 nportsc.py $target-ip --tcp (T1,T2,T3,T4,T5)  # For TCP scan
+sudo python3 nportsc.py $target-ip --tcp (T1,T2,T3,T4,T5) <extra flags> # For TCP scan
 
-sudo python3 nportsc.py $target-ip --udp (T1,T2,T3,T4,T5)  # For UDP scan
+sudo python3 nportsc.py $target-ip --udp (T1,T2,T3,T4,T5) <extra flags> # For UDP scan
 
 ## Output
 
 The results of the detailed scan will be saved to a text file: 
 (target_ip)_(scan type)_nmap.txt 
-The file will also automatically be opened in a text editor. Each port that is scanned will also be seperated, making it easier to read.
+Each port that is scanned will also be seperated in the output, making it easier to look through.
