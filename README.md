@@ -5,7 +5,7 @@ Nportsc is an Nmap port scanning script written in Python with ChatGPT that auto
 
 ## Features
 - Scanning of both TCP and UDP ports using Nmap.
-- Can add extra flags in the terminal as needed
+- Can add extra flags in the terminal as needed such as -Pn 
 - Scan speed can be adjusted based on your environment
 - After scan is complete, will grep out open ports automatically with services
 - Detailed scan outputs to a txt file 
