@@ -4,7 +4,7 @@ import subprocess
 import sys
 import re
 import os
-import argparse  # Added import for argparse
+import argparse
 
 # ANSI escape codes for colors
 ORANGE = "\033[38;5;214m"  # Using a specific 256-color orange
@@ -29,21 +29,21 @@ def format_output_for_file(scan_output):
 
     for i, line in enumerate(lines):
         formatted_output.append(line)
-        # Add a blank line after each line that contains a port entry, 
+        # Add a blank line after each line that contains a port entry,
         # but avoid adding one after the last port entry.
         if re.match(r'^\d+/(tcp|udp)', line) and i < len(lines) - 1:
             formatted_output.append('')  # Add a blank line
 
     return "\n".join(formatted_output)
 
-def run_nmap_quick_scan(target_ip, scan_type, timing_template):
+def run_nmap_quick_scan(target_ip, scan_type, timing_template, extra_args):
     """Run the quick Nmap scan on the target IP for either TCP or UDP."""
     if scan_type == 'tcp':
         print(f"Running quick TCP scan on {target_ip} with timing {timing_template}...")
-        command = ["sudo", "nmap", "-p-", f"-{timing_template}", target_ip]
+        command = ["sudo", "nmap", "-p-", f"-{timing_template}", target_ip] + extra_args
     elif scan_type == 'udp':
         print(f"Running quick UDP scan on {target_ip} with timing {timing_template}...")
-        command = ["sudo", "nmap", "-sU", "--top-ports=100", "--open", f"-{timing_template}", target_ip]  # -sU flag for UDP scanning
+        command = ["sudo", "nmap", "-sU", "--top-ports=100", "--open", f"-{timing_template}", target_ip] + extra_args
 
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -134,6 +134,7 @@ def main():
     parser.add_argument('--tcp', action='store_true', help='Run TCP scan')
     parser.add_argument('--udp', action='store_true', help='Run UDP scan')
     parser.add_argument('timing_template', choices=['T1', 'T2', 'T3', 'T4', 'T5'], help='Specify Nmap timing template (T1 to T5)')
+    parser.add_argument('extra_args', nargs=argparse.REMAINDER, help='Additional Nmap arguments (e.g., -Pn, --script vuln)')
 
     args = parser.parse_args()
 
@@ -144,9 +145,11 @@ def main():
     scan_type = 'tcp' if args.tcp else 'udp'
     target_ip = args.target_ip
     timing_template = args.timing_template
+    extra_args = args.extra_args
 
     try:
-        scan_output = run_nmap_quick_scan(target_ip, scan_type, timing_template)
+        # Pass extra_args to the quick scan function
+        scan_output = run_nmap_quick_scan(target_ip, scan_type, timing_template, extra_args)
         open_ports, http_ports = extract_open_ports(scan_output)
         run_nmap_detail_scan(target_ip, open_ports, scan_type)
     except KeyboardInterrupt:
