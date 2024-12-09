@@ -19,9 +19,9 @@ Nportsc is an Nmap port scanning script written in Python with ChatGPT that auto
 ## Usage
 To use the script, run the following command in your terminal:
 
-sudo python3 nportsc.py $target-ip --tcp (T1,T2,T3,T4,T5) $extra flags$ # For TCP scan
+sudo python3 nportsc.py $target-ip --tcp (T1,T2,T3,T4,T5) $extra flags # For TCP scan
 
-sudo python3 nportsc.py $target-ip --udp (T1,T2,T3,T4,T5) $extra flags$ # For UDP scan
+sudo python3 nportsc.py $target-ip --udp (T1,T2,T3,T4,T5) $extra flags # For UDP scan
 
 ## Output
 
